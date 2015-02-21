@@ -1,0 +1,55 @@
+defmodule Yearleap do
+  import Plug.Conn
+  import Guardsafe
+
+  def init(options) do
+    options
+  end
+
+  def call(connection, options) do
+    handle(connection, connection.path_info)
+  end
+
+  defp handle(connection, []) do
+    bad_request(connection, "No year to check provided.")
+  end
+
+  defp handle(connection, [year|_]) do
+    case validate_year(year) do
+      {:ok, year} -> respond(connection, year)
+      {:error, reason} -> bad_request(connection, reason)
+    end
+  end
+
+  defp validate_year(year) do
+    try do
+      {:ok, String.to_integer(year)}
+    rescue
+      _ in ArgumentError -> {:error, "Invalid year"}
+    end
+  end
+
+  defp respond(connection, year) do
+    connection
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, leap_year_response_for(year))
+  end
+
+  defp bad_request(connection, reason) do
+    connection
+    |> put_resp_content_type("text/plain")
+    |> send_resp(400, reason)
+  end
+
+  defp leap_year_response_for(year) do
+    if leap_year? year do
+      "#{year} is a leap year!"
+    else
+      "#{year} is not a leap year."
+    end
+  end
+
+  defp leap_year?(year) when divisible_by?(year, 400), do: true
+  defp leap_year?(year) when divisible_by?(year, 100), do: false
+  defp leap_year?(year), do: divisible_by?(year, 4)
+end
