@@ -10,8 +10,7 @@ defmodule Yearleap do
   end
 
   def start(port) do
-    IO.inspect port
-    IO.inspect Plug.Adapters.Cowboy.http __MODULE__, [], [port: port]
+    Plug.Adapters.Cowboy.http __MODULE__, [], [port: port]
     :timer.sleep(:infinity)
   end
 
