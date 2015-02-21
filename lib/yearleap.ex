@@ -2,11 +2,22 @@ defmodule Yearleap do
   import Plug.Conn
   import Guardsafe
 
-  def init(options) do
-    options
+  def start do
+    "PORT"
+    |> System.get_env
+    |> String.to_integer
+    |> start
   end
 
-  def call(connection, options) do
+  def start(port) do
+    IO.inspect port
+    IO.inspect Plug.Adapters.Cowboy.http __MODULE__, [], [port: port]
+    :timer.sleep(:infinity)
+  end
+
+  def init(options), do: options
+
+  def call(connection, _) do
     handle(connection, connection.path_info)
   end
 
@@ -25,7 +36,7 @@ defmodule Yearleap do
     try do
       {:ok, String.to_integer(year)}
     rescue
-      _ in ArgumentError -> {:error, "Invalid year"}
+      _ in ArgumentError -> {:error, "'#{year}' is an invalid year."}
     end
   end
 
