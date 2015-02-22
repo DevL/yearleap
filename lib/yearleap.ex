@@ -1,6 +1,5 @@
 defmodule Yearleap do
   import Plug.Conn
-  import Guardsafe
 
   def start do
     "PORT"
@@ -52,14 +51,10 @@ defmodule Yearleap do
   end
 
   defp leap_year_response_for(year) do
-    if leap_year? year do
+    if LeapYear.leap_year? year do
       "#{year} is a leap year!"
     else
       "#{year} is not a leap year."
     end
   end
-
-  defp leap_year?(year) when divisible_by?(year, 400), do: true
-  defp leap_year?(year) when divisible_by?(year, 100), do: false
-  defp leap_year?(year), do: divisible_by?(year, 4)
 end
